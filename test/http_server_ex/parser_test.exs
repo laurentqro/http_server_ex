@@ -14,4 +14,11 @@ defmodule HttpServerEx.Parser.Test do
 
     assert conn.method == "POST"
   end
+
+  test "parses the path" do
+    request = "GET /hello HTTP/1.1"
+    conn = request |> HttpServerEx.Parser.parse
+
+    assert conn.path == "/hello"
+  end
 end
