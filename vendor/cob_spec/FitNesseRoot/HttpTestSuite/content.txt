@@ -1,0 +1,11 @@
+!3 Test Parameters
+!define TEST_SYSTEM {slim}
+
+!pomFile pom.xml
+!path target/Fixtures-1.0.jar
+
+!3 User-Defined Variables
+-!define SERVER_START_COMMAND {../../http_server}
+!define PUBLIC_DIR {./public/}
+
+!contents -R2 -g -p -f -h
