@@ -1,29 +1,31 @@
 defmodule HttpServerEx.Response.Test do
   use ExUnit.Case
 
-  test "returns the contents of a file" do
-    File.mkdir("tmp")
-    File.write("tmp/file.txt", "hello")
-    file_path = "tmp/file.txt"
+  @test_dir Application.get_env(:http_server_ex, :public_dir)
+  @file_path "#{@test_dir}/file.txt"
 
-    { :ok, file_content } = File.read(file_path)
+  setup do
+    File.mkdir_p(@test_dir)
+    on_exit fn ->
+      File.rm_rf @test_dir
+    end
+  end
+
+  test "returns the contents of a file" do
+    File.write(@file_path, "hello")
 
     conn = %{ method: "GET", path: "/file.txt" }
     response = conn |> HttpServerEx.Response.respond
 
-    assert response == file_content
+    assert response == "hello"
   end
 
   test "returns the contents of another file" do
-    File.mkdir("tmp")
-    File.write("tmp/file.txt", "goodbye")
-    file_path = "tmp/file.txt"
-
-    { :ok, file_content } = File.read(file_path)
+    File.write(@file_path, "bye")
 
     conn = %{ method: "GET", path: "/file.txt" }
     response = conn |> HttpServerEx.Response.respond
 
-    assert response == file_content
+    assert response == "bye"
   end
 end
