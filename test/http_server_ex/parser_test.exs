@@ -1,25 +1,11 @@
 defmodule HttpServerEx.Parser.Test do
   use ExUnit.Case
 
-  test "parses GET verb from the request" do
-    request = "GET /hello HTTP/1.1"
+  test "parses the verb" do
+    request = "VERB /path HTTP/1.1"
     conn = request |> HttpServerEx.Parser.parse
 
-    assert conn.method == "GET"
-  end
-
-  test "parses POST verb from the request" do
-    request = "POST /hello HTTP/1.1"
-    conn = request |> HttpServerEx.Parser.parse
-
-    assert conn.method == "POST"
-  end
-
-  test "parses HEAD verb from the request" do
-    request = "HEAD /hello HTTP/1.1"
-    conn = request |> HttpServerEx.Parser.parse
-
-    assert conn.method == "HEAD"
+    assert conn.method == "VERB"
   end
 
   test "parses the path" do
