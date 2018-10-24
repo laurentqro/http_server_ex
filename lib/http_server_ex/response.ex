@@ -4,6 +4,10 @@ defmodule HttpServerEx.Response do
   def respond(conn) do
     file_path = @public_dir <> conn.path
     {:ok, file_content} = File.read(file_path)
-    file_content
+
+    """
+    HTTP/1.1 200 OK
+    #{file_content}
+    """
   end
 end
