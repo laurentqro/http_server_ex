@@ -14,7 +14,7 @@ defmodule HttpServerEx.Response.Test do
   test "returns the contents of a file" do
     File.write(@file_path, "hello")
 
-    conn = %{ method: "GET", path: "/file.txt" }
+    conn = %{ method: "GET", path: "/file.txt", status: nil, resp_body: nil }
     response = conn |> HttpServerEx.Response.respond
 
     assert response |> String.contains?("hello")
@@ -23,7 +23,7 @@ defmodule HttpServerEx.Response.Test do
   test "returns the contents of another file" do
     File.write(@file_path, "bye")
 
-    conn = %{ method: "GET", path: "/file.txt" }
+    conn = %{ method: "GET", path: "/file.txt", status: nil, resp_body: nil }
     response = conn |> HttpServerEx.Response.respond
 
     assert response |> String.contains?("bye")
@@ -32,7 +32,7 @@ defmodule HttpServerEx.Response.Test do
   test "returns status 200" do
     File.write(@file_path, "hello")
 
-    conn = %{ method: "GET", path: "/file.txt" }
+    conn = %{ method: "GET", path: "/file.txt", status: nil, resp_body: nil }
     response = conn |> HttpServerEx.Response.respond
 
     assert response |> String.contains?("200 OK")

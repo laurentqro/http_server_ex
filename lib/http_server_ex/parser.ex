@@ -8,8 +8,10 @@ defmodule HttpServerEx.Parser do
     %{
       method: method,
       path: path,
+      status: nil,
       protocol: protocol,
-      headers: parse_headers(headers, %{})
+      headers: parse_headers(headers, %{}),
+      resp_body: nil
     }
   end
 
