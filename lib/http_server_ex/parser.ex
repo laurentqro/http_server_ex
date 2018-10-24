@@ -1,17 +1,17 @@
 defmodule HttpServerEx.Parser do
+  alias HttpServerEx.Conn
+
   def parse(request) do
     [ head    | _tail ]        = request |> String.split("\r\n\r\n")
     [ request | headers ]      = head    |> String.split("\r\n")
 
     [ method, path, protocol ] = request |> String.split(" ")
 
-    %{
+    %Conn{
       method: method,
       path: path,
-      status: nil,
       protocol: protocol,
-      headers: parse_headers(headers, %{}),
-      resp_body: nil
+      headers: parse_headers(headers, %{})
     }
   end
 
