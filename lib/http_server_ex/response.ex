@@ -18,6 +18,8 @@ defmodule HttpServerEx.Response do
         %{ conn | status: 200, resp_body: content }
       { :error, :enoent } ->
         %{ conn | status: 404 }
+      {:error, :eisdir} ->
+        %{ conn | status: 200 }
     end
   end
 

@@ -31,7 +31,7 @@ defmodule HttpServerEx.Response.Test do
     assert response |> String.contains?("bye")
   end
 
-  test "returns status 200" do
+  test "GET returns status 200" do
     File.write(@file_path, "hello")
 
     conn = %Conn{ method: "GET", path: "/file.txt" }
@@ -40,11 +40,33 @@ defmodule HttpServerEx.Response.Test do
     assert response |> String.contains?("200 OK")
   end
 
-  test "returns 404 when requested resource is not found" do
+  test "GET returns 404 for non-existent resource" do
     conn = %Conn{ method: "GET", path: "/file.txt" }
     response = conn |> HttpServerEx.Response.respond
 
-    IO.inspect conn
     assert response |> String.contains?("404 Not found")
+  end
+
+  test "HEAD returns 200" do
+    conn = %Conn{ method: "HEAD", path: "/" }
+    response = conn |> HttpServerEx.Response.respond
+
+    assert response |> String.contains?("200 OK")
+  end
+
+  test "HEAD returns 404 for non-existent resource" do
+    conn = %Conn{ method: "HEAD", path: "/file.txt" }
+    response = conn |> HttpServerEx.Response.respond
+
+    assert response |> String.contains?("404 Not found")
+  end
+
+  test "HEAD response contains no body" do
+    File.write(@file_path, "hello")
+
+    conn = %Conn{ method: "HEAD", path: "/file.txt" }
+    response = conn |> HttpServerEx.Response.respond
+
+    assert conn.resp_body |> String.trim == ""
   end
 end
