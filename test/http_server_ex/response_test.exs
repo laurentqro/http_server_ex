@@ -1,6 +1,8 @@
 defmodule HttpServerEx.Response.Test do
   use ExUnit.Case
 
+  alias HttpServerEx.Conn
+
   @test_dir Application.get_env(:http_server_ex, :public_dir)
   @file_path "#{@test_dir}/file.txt"
 
@@ -14,7 +16,7 @@ defmodule HttpServerEx.Response.Test do
   test "returns the contents of a file" do
     File.write(@file_path, "hello")
 
-    conn = %{ method: "GET", path: "/file.txt", status: nil, resp_body: nil }
+    conn = %Conn{ method: "GET", path: "/file.txt" }
     response = conn |> HttpServerEx.Response.respond
 
     assert response |> String.contains?("hello")
@@ -23,7 +25,7 @@ defmodule HttpServerEx.Response.Test do
   test "returns the contents of another file" do
     File.write(@file_path, "bye")
 
-    conn = %{ method: "GET", path: "/file.txt", status: nil, resp_body: nil }
+    conn = %Conn{ method: "GET", path: "/file.txt" }
     response = conn |> HttpServerEx.Response.respond
 
     assert response |> String.contains?("bye")
@@ -32,9 +34,17 @@ defmodule HttpServerEx.Response.Test do
   test "returns status 200" do
     File.write(@file_path, "hello")
 
-    conn = %{ method: "GET", path: "/file.txt", status: nil, resp_body: nil }
+    conn = %Conn{ method: "GET", path: "/file.txt" }
     response = conn |> HttpServerEx.Response.respond
 
     assert response |> String.contains?("200 OK")
+  end
+
+  test "returns 404 when requested resource is not found" do
+    conn = %Conn{ method: "GET", path: "/file.txt" }
+    response = conn |> HttpServerEx.Response.respond
+
+    IO.inspect conn
+    assert response |> String.contains?("404 Not found")
   end
 end
