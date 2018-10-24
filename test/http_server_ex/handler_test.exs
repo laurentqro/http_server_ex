@@ -15,6 +15,6 @@ defmodule HttpServerEx.Handler.Test do
     File.write(@file_path, "hello")
     response = "GET /file.txt HTTP/1.1" |> HttpServerEx.Handler.handle
 
-    assert response == "hello"
+    assert response |> String.contains?("hello")
   end
 end

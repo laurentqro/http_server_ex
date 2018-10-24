@@ -19,7 +19,7 @@ defmodule HttpServerEx.Server.Test do
   end
 
   test "server interaction", %{socket: socket} do
-    assert send_and_receive(socket, "GET /file.txt HTTP/1.1") == "hello"
+    assert send_and_receive(socket, "GET /file.txt HTTP/1.1") |> String.contains?("hello")
   end
 
   defp send_and_receive(socket, request) do
