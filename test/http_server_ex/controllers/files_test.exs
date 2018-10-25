@@ -81,4 +81,14 @@ defmodule HttpServerEx.Controllers.Files.Test do
 
     assert conn.status == 200
   end
+
+  test "response body has directory links when request path is directory" do
+    File.write(@file_path, "hello")
+
+    conn = %Conn{ method: "GET", path: "/" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 200
+    assert conn.resp_body |> String.contains?(~s(<a href="/file.txt">file.txt</a>))
+  end
 end
