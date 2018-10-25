@@ -6,7 +6,11 @@ defmodule HttpServerEx.Response do
   end
 
   def build_response(conn) do
-    %{ conn | status: conn.status, resp_body: conn.resp_body, resp_headers: format_headers(conn.resp_headers) }
+    %{ conn |
+      status: conn.status,
+      resp_body: conn.resp_body,
+      resp_headers: format_headers(conn.resp_headers)
+    }
   end
 
   def format_response(conn) do
