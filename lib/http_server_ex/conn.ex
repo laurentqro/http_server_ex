@@ -6,6 +6,6 @@ defmodule HttpServerEx.Conn do
     protocol: nil,
     headers: %{},
     resp_body: "",
-    resp_headers: %{}
+    resp_headers: %{"Content-Type" => "text/html"}
   )
 end

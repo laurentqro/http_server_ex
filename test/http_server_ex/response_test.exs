@@ -23,4 +23,22 @@ defmodule HttpServerEx.Response.Test do
 
     assert response |> String.contains?("hello")
   end
+
+  test "response is properly formatted" do
+    conn = %Conn{
+      status: 200,
+      resp_body: "hello"
+    }
+
+    response = conn |> HttpServerEx.Response.respond
+
+    expected = """
+    HTTP/1.1 200 OK\r
+    Content-Type: text/html\r
+    \r
+    hello
+    """
+
+    assert response == expected
+  end
 end
