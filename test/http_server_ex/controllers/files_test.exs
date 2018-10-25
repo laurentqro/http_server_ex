@@ -91,4 +91,13 @@ defmodule HttpServerEx.Controllers.Files.Test do
     assert conn.status == 200
     assert conn.resp_body |> String.contains?(~s(<a href="/file.txt">file.txt</a>))
   end
+
+  test "gibberish request method returns status 405 method not allowed" do
+    File.write(@file_path, "hello")
+
+    conn = %Conn{ method: "PFTCURPN", path: "/file.txt" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 405
+  end
 end

@@ -25,7 +25,8 @@ defmodule HttpServerEx.Response do
   defp reason(status) do
     %{
       200 => "OK",
-      404 => "Not found"
+      404 => "Not Found",
+      405 => "Method Not Allowed"
     }[status]
   end
 

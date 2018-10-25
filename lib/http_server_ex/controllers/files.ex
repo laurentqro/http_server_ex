@@ -36,6 +36,10 @@ defmodule HttpServerEx.Controllers.Files do
     }
   end
 
+  defp handle_file(_, conn = %{method: _}) do
+    %{ conn | status: 405 }
+  end
+
   defp render_dir_listing(conn) do
     conn
     |> dir_listing
