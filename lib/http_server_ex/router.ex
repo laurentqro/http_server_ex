@@ -4,7 +4,7 @@ defmodule HttpServerEx.Router do
       "/logs" ->
         HttpServerEx.Controllers.Logs.process(conn)
       _ ->
-        conn
+        HttpServerEx.Controllers.Default.process(conn)
     end
   end
 end

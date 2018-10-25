@@ -69,4 +69,11 @@ defmodule HttpServerEx.Response.Test do
 
     assert conn.resp_body |> String.trim == ""
   end
+
+  test "includes formatted response headers" do
+    conn = %Conn{ resp_headers: %{"Foo": "Bar"} }
+    response = conn |> HttpServerEx.Response.respond
+
+    assert response |> String.contains?("Foo: Bar")
+  end
 end

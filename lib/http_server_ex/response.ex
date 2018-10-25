@@ -9,7 +9,7 @@ defmodule HttpServerEx.Response do
   end
 
   def build_response(conn) do
-    %{ conn | status: conn.status, resp_body: conn.resp_body }
+    %{ conn | status: conn.status, resp_body: conn.resp_body, resp_headers: format_headers(conn.resp_headers) }
   end
 
   def process_file(conn) do
@@ -26,6 +26,7 @@ defmodule HttpServerEx.Response do
   def format_response(conn) do
     """
     HTTP/1.1 #{conn.status} #{reason(conn.status)}\r
+    #{conn.resp_headers}\r
     \r
     #{conn.resp_body}
     """
@@ -36,5 +37,10 @@ defmodule HttpServerEx.Response do
       200 => "OK",
       404 => "Not found"
     }[status]
+  end
+
+  defp format_headers(headers) do
+    headers
+    |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
   end
 end
