@@ -64,4 +64,21 @@ defmodule HttpServerEx.Controllers.Files.Test do
 
     assert conn.resp_body == ""
   end
+
+  test "OPTIONS Allow header has GET, HEAD, OPTIONS, PUT, DELETE" do
+    File.write(@file_path, "hello")
+
+    conn = %Conn{ method: "OPTIONS", path: "/file.txt" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.resp_headers["Allow"] == "GET, HEAD, OPTIONS, PUT, DELETE"
+    assert conn.status == 200
+  end
+
+  test "OPTIONS request to non existing file still returns status 200" do
+    conn = %Conn{ method: "OPTIONS", path: "/file.txt" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 200
+  end
 end

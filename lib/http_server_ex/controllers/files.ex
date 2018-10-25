@@ -8,11 +8,21 @@ defmodule HttpServerEx.Controllers.Files do
   end
 
   defp handle_file({:ok, content}, conn = %{method: "GET"}) do
-    %{ conn | status: 200, resp_body: content }
+    %{ conn |
+      status: 200,
+      resp_body: content
+    }
   end
 
   defp handle_file({:ok, _content}, conn = %{method: "HEAD"}) do
     %{ conn | status: 200 }
+  end
+
+  defp handle_file(_, conn = %{method: "OPTIONS"}) do
+    %{ conn |
+      status: 200,
+      resp_headers: %{"Allow" => "GET, HEAD, OPTIONS, PUT, DELETE"}
+    }
   end
 
   defp handle_file({:error, :enoent}, conn) do
