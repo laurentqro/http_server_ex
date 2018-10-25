@@ -5,6 +5,7 @@ defmodule HttpServerEx.Conn do
     status: nil,
     protocol: nil,
     headers: %{},
-    resp_body: ""
+    resp_body: "",
+    resp_headers: %{}
   )
 end
