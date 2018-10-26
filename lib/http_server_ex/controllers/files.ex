@@ -25,8 +25,15 @@ defmodule HttpServerEx.Controllers.Files do
     }
   end
 
-  defp handle_file({:error, :enoent}, conn) do
+  defp handle_file({:error, :enoent}, conn = %{method: method}) when method in ["GET", "HEAD"] do
     %{ conn | status: 404 }
+  end
+
+  defp handle_file({:error, :enoent}, conn = %{method: "PUT"}) do
+    @public_dir <> conn.path
+    |> File.write(conn.req_body)
+
+    %{ conn | status: 201 }
   end
 
   defp handle_file({:error, :eisdir}, conn) do

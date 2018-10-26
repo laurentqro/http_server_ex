@@ -100,4 +100,19 @@ defmodule HttpServerEx.Controllers.Files.Test do
 
     assert conn.status == 405
   end
+
+  test "PUT request creates file if it does not already exist" do
+    conn = %Conn{ method: "PUT", path: "/new_file.txt", req_body: "foo" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 201
+
+    File.ls("tmp") |> IO.inspect
+
+    conn = %Conn{ method: "GET", path: "/new_file.txt" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 200
+    assert conn.resp_body == "foo"
+  end
 end
