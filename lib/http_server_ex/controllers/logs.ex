@@ -17,6 +17,10 @@ defmodule HttpServerEx.Controllers.Logs do
     |> handle_authentication(conn)
   end
 
+  def process(conn = %{ method: "POST" }) do
+    %{ conn | status: 405 }
+  end
+
   def process(conn) do
     %{ conn | status: 200 }
   end
