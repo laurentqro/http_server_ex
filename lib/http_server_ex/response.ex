@@ -15,7 +15,7 @@ defmodule HttpServerEx.Response do
 
   def format_response(conn) do
     """
-    HTTP/1.1 #{conn.status} #{reason(conn.status)}\r
+    #{conn.protocol} #{conn.status} #{reason(conn.status)}\r
     #{conn.resp_headers}\r
     \r
     #{conn.resp_body}

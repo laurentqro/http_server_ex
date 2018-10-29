@@ -3,7 +3,7 @@ defmodule HttpServerEx.Conn do
     method: "",
     path: "",
     status: nil,
-    protocol: nil,
+    protocol: "HTTP/1.1",
     headers: %{},
     req_body: "",
     resp_body: "",
