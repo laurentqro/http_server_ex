@@ -33,5 +33,7 @@ defmodule HttpServerEx.Response do
   defp format_headers(headers) do
     headers
     |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
+    |> Enum.reverse
+    |> Enum.join("\r\n")
   end
 end

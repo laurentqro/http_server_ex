@@ -41,4 +41,24 @@ defmodule HttpServerEx.Response.Test do
 
     assert response == expected
   end
+
+  test "response with multiple headers is properly formatted" do
+    conn = %Conn{
+      status: 200,
+      resp_body: "hello",
+      resp_headers: %{"Foo" => "Bar", "Baz" => "Boom"}
+    }
+
+    response = conn |> HttpServerEx.Response.respond
+
+    expected = """
+    HTTP/1.1 200 OK\r
+    Foo: Bar\r
+    Baz: Boom\r
+    \r
+    hello
+    """
+
+    assert response == expected
+  end
 end
