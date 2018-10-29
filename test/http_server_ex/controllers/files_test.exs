@@ -107,8 +107,6 @@ defmodule HttpServerEx.Controllers.Files.Test do
 
     assert conn.status == 201
 
-    File.ls("tmp") |> IO.inspect
-
     conn = %Conn{ method: "GET", path: "/new_file.txt" }
     conn = conn |> HttpServerEx.Controllers.Files.process
 

@@ -36,4 +36,16 @@ defmodule HttpServerEx.Parser.Test do
 
     assert conn.headers == expected
   end
+
+  test "parses the request body" do
+    request = """
+    PUT /file1 HTTP/1.1\r
+    \r
+    Hello, world
+    """
+
+    conn = request |> HttpServerEx.Parser.parse
+
+    assert conn.req_body == "Hello, world\n"
+  end
 end
