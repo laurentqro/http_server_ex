@@ -29,10 +29,13 @@ defmodule HttpServerEx.Controllers.Files do
     %{ conn | status: 404 }
   end
 
-  defp handle_file({:error, :enoent}, conn = %{method: "PUT"}) do
-    @public_dir <> conn.path
-    |> File.write(conn.req_body)
+  defp handle_file({:ok, _content}, conn = %{method: "PUT"}) do
+    write_file(conn.path, conn.req_body)
+    %{ conn | status: 200 }
+  end
 
+  defp handle_file({:error, :enoent}, conn = %{method: "PUT"}) do
+    write_file(conn.path, conn.req_body)
     %{ conn | status: 201 }
   end
 
@@ -66,5 +69,10 @@ defmodule HttpServerEx.Controllers.Files do
 
   defp to_li(item) do
     "<li>#{item}</li>"
+  end
+
+  defp write_file(path, content) do
+    @public_dir <> path
+    |> File.write(content)
   end
 end

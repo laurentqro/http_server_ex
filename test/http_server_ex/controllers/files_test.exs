@@ -113,4 +113,14 @@ defmodule HttpServerEx.Controllers.Files.Test do
     assert conn.status == 200
     assert conn.resp_body == "foo"
   end
+
+  test "PUT request updates existing file" do
+    File.write(@file_path, "hello")
+
+    conn = %Conn{ method: "PUT", path: "/file.txt", req_body: "foo" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 200
+    assert File.read!(@file_path) == "foo"
+  end
 end
