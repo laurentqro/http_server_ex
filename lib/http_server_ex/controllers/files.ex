@@ -39,6 +39,11 @@ defmodule HttpServerEx.Controllers.Files do
     %{ conn | status: 201 }
   end
 
+  defp handle_file({:ok, _content}, conn = %{method: "DELETE"}) do
+    File.rm(@public_dir <> conn.path)
+    %{ conn | status: 200 }
+  end
+
   defp handle_file({:error, :eisdir}, conn) do
     %{ conn |
       status: 200,

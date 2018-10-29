@@ -123,4 +123,14 @@ defmodule HttpServerEx.Controllers.Files.Test do
     assert conn.status == 200
     assert File.read!(@file_path) == "foo"
   end
+
+  test "DELETE deletes file" do
+    File.write(@file_path, "hello")
+
+    conn = %Conn{ method: "DELETE", path: "/file.txt" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 200
+    {:error, :enoent} = File.read(@file_path)
+  end
 end
