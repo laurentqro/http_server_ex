@@ -3,6 +3,18 @@ defmodule HttpServerEx.Controllers.Logs.Test do
 
   alias HttpServerEx.Conn
 
+  @env Application.get_env(:http_server_ex, :env)
+  @logs_dir Application.get_env(:http_server_ex, :logs_dir)
+  @log_file_path ("/#{@env}.log")
+
+  setup do
+    File.mkdir_p(@logs_dir)
+    File.write(@logs_dir <> @log_file_path, "foo")
+    on_exit fn ->
+      File.rm_rf @logs_dir
+    end
+  end
+
   test "OPTIONS request to logs returns GET, HEAD, OPTIONS" do
     conn = %Conn{method: "OPTIONS", path: "/logs"}
     conn = conn |> HttpServerEx.Controllers.Logs.process
@@ -24,9 +36,10 @@ defmodule HttpServerEx.Controllers.Logs.Test do
     conn = conn |> HttpServerEx.Controllers.Logs.process
 
     assert conn.status == 200
+    assert conn.resp_body == "foo"
   end
 
-  test "response to request to /logs should include authentication method" do
+  test "response header to request to /logs should include authentication method" do
     conn = %Conn{method: "GET", path: "/logs"}
     conn = conn |> HttpServerEx.Controllers.Logs.process
 

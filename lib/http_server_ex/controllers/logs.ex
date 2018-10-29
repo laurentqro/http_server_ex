@@ -2,6 +2,8 @@ defmodule HttpServerEx.Controllers.Logs do
   @user_id   Application.get_env(:http_server_ex, :basic_auth_user_id)
   @password  Application.get_env(:http_server_ex, :basic_auth_password)
 
+  alias HttpServerEx.Logger
+
   def process(conn = %{ method: "OPTIONS" }) do
     %{ conn |
       resp_headers: %{ "Allow" => "GET, HEAD, OPTIONS" },
@@ -25,7 +27,8 @@ defmodule HttpServerEx.Controllers.Logs do
 
   defp handle_authentication(_authorized = true, conn) do
     %{ conn |
-      status: 200
+      status: 200,
+      resp_body: Logger.read_logs()
     }
   end
 

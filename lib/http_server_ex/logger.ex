@@ -12,4 +12,8 @@ defmodule HttpServerEx.Logger do
     )
     request
   end
+
+  def read_logs do
+    File.read!(@logs_dir <> @log_file_path)
+  end
 end
