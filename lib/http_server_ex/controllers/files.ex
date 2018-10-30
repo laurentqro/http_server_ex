@@ -11,7 +11,7 @@ defmodule HttpServerEx.Controllers.Files do
     %{ conn |
       status: 200,
       resp_body: content,
-      resp_headers: %{ conn.resp_headers | "Content-Type" => mime_type(conn.path) }
+      resp_headers: %{ "Content-Type" => HttpServerEx.MIME.type(conn.path) }
     }
   end
 
@@ -80,25 +80,5 @@ defmodule HttpServerEx.Controllers.Files do
   defp write_file(path, content) do
     @public_dir <> path
     |> File.write(content)
-  end
-
-  defp mime_type(path) do
-    path
-    |> to_ext
-    |> to_mime
-  end
-
-  defp to_ext(path) do
-    [_name, ext] = path |> String.split(".")
-    ext
-  end
-
-  defp to_mime(ext) do
-    %{
-      "jpeg" => "image/jpeg",
-      "png" => "image/png",
-      "gif" => "image/gif",
-      "txt" => "text/plain"
-    }[ext]
   end
 end

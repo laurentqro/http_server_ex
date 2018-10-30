@@ -27,14 +27,15 @@ defmodule HttpServerEx.Response.Test do
   test "response is properly formatted" do
     conn = %Conn{
       status: 200,
-      resp_body: "hello"
+      resp_body: "hello",
+      resp_headers: %{ "Foo" => "Bar" }
     }
 
     response = conn |> HttpServerEx.Response.respond
 
     expected = """
     HTTP/1.1 200 OK\r
-    Content-Type: text/html\r
+    Foo: Bar\r
     \r
     hello
     """

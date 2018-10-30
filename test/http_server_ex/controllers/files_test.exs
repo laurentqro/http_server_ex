@@ -134,39 +134,12 @@ defmodule HttpServerEx.Controllers.Files.Test do
     {:error, :enoent} = File.read(@file_path)
   end
 
-  test "set image/jpeg media type in response header" do
+  test "set media type in response header" do
     File.write(@test_dir <> "/image.jpeg", "foo")
 
     conn = %Conn{ method: "GET", path: "/image.jpeg" }
     conn = conn |> HttpServerEx.Controllers.Files.process
 
     assert conn.resp_headers["Content-Type"] == "image/jpeg"
-  end
-
-  test "set image/png media type in response header" do
-    File.write(@test_dir <> "/image.png", "foo")
-
-    conn = %Conn{ method: "GET", path: "/image.png" }
-    conn = conn |> HttpServerEx.Controllers.Files.process
-
-    assert conn.resp_headers["Content-Type"] == "image/png"
-  end
-
-  test "set image/gif media type in response header" do
-    File.write(@test_dir <> "/image.gif", "foo")
-
-    conn = %Conn{ method: "GET", path: "/image.gif" }
-    conn = conn |> HttpServerEx.Controllers.Files.process
-
-    assert conn.resp_headers["Content-Type"] == "image/gif"
-  end
-
-  test "set text/plain media type in response header" do
-    File.write(@file_path, "hello")
-
-    conn = %Conn{ method: "GET", path: "/file.txt" }
-    conn = conn |> HttpServerEx.Controllers.Files.process
-
-    assert conn.resp_headers["Content-Type"] == "text/plain"
   end
 end
