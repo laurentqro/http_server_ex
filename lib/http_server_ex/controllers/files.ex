@@ -11,7 +11,10 @@ defmodule HttpServerEx.Controllers.Files do
     %{ conn |
       status: 200,
       resp_body: content,
-      resp_headers: %{ "Content-Type" => HttpServerEx.MIME.type(conn.path) }
+      resp_headers: %{
+        "Content-Type" => HttpServerEx.MIME.type(conn.path),
+        "ETag"         => HttpServerEx.Crypto.sha(content)
+      }
     }
   end
 
@@ -38,6 +41,12 @@ defmodule HttpServerEx.Controllers.Files do
   defp handle_file({:error, :enoent}, conn = %{method: "PUT"}) do
     write_file(conn.path, conn.req_body)
     %{ conn | status: 201 }
+  end
+
+  defp handle_file({:ok, content}, conn = %{method: "PATCH"}) do
+    conn
+    |> patch_authorized?(content)
+    |> update_file(conn)
   end
 
   defp handle_file({:ok, _content}, conn = %{method: "DELETE"}) do
@@ -80,5 +89,19 @@ defmodule HttpServerEx.Controllers.Files do
   defp write_file(path, content) do
     @public_dir <> path
     |> File.write(content)
+  end
+
+  defp update_file(_authorized = true, conn) do
+    @public_dir <> conn.path
+    |> File.write(conn.req_body, [:append])
+    %{ conn | status: 204 }
+  end
+
+  defp update_file(_authorized = false, conn) do
+    %{ conn | status: 412 }
+  end
+
+  defp patch_authorized?(conn, content) do
+    conn.headers["If-Match"] == HttpServerEx.Crypto.sha(content)
   end
 end

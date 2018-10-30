@@ -142,4 +142,47 @@ defmodule HttpServerEx.Controllers.Files.Test do
 
     assert conn.resp_headers["Content-Type"] == "image/jpeg"
   end
+
+  test "set ETag" do
+    File.write(@file_path, "default content")
+
+    conn = %Conn{ method: "GET", path: "/file.txt" }
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.resp_headers["ETag"] == "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec"
+  end
+
+  test "PATCH makes a partial update to the file" do
+    File.write(@file_path, "default content")
+
+    conn = %Conn{
+      method: "PATCH",
+      path: "/file.txt",
+      req_body: "patched content",
+      headers: %{"If-Match" => "dc50a0d27dda2eee9f65644cd7e4c9cf11de8bec"}
+    }
+
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 204
+    assert conn.resp_body == ""
+    assert File.read!(@file_path) |> String.contains?("default content")
+    assert File.read!(@file_path) |> String.contains?("patched content")
+  end
+
+  test "PATCH fails if request If-Match does not match ETag" do
+    File.write(@file_path, "default content")
+
+    conn = %Conn{
+      method: "PATCH",
+      path: "/file.txt",
+      req_body: "patched content",
+      headers: %{"If-Match" => "foo"}
+    }
+
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 412
+    assert !(File.read!(@file_path) |> String.contains?("patched content"))
+  end
 end

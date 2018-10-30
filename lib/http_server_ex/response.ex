@@ -26,7 +26,8 @@ defmodule HttpServerEx.Response do
     %{
       200 => "OK",
       404 => "Not Found",
-      405 => "Method Not Allowed"
+      405 => "Method Not Allowed",
+      412 => "Precondition Failed"
     }[status]
   end
 
