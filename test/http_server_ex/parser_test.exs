@@ -48,4 +48,11 @@ defmodule HttpServerEx.Parser.Test do
 
     assert conn.req_body == "Hello, world\n"
   end
+
+  test "parses the request query string parameters" do
+    request = "GET /parameters?variable_1=a%20query%20string%20parameter HTTP/1.1"
+    conn = request |> HttpServerEx.Parser.parse
+
+    assert conn.params == %{ "variable_1" => "a query string parameter" }
+  end
 end

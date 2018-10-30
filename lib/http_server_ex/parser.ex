@@ -12,6 +12,7 @@ defmodule HttpServerEx.Parser do
       path: path,
       protocol: protocol,
       headers: parse_headers(headers, %{}),
+      params: parse_params(path),
       req_body: List.first(body)
     }
   end
@@ -23,4 +24,11 @@ defmodule HttpServerEx.Parser do
   end
 
   defp parse_headers([], headers), do: headers
+
+  defp parse_params(path) do
+    path
+    |> String.split("?")
+    |> List.last
+    |> URI.decode_query
+  end
 end
