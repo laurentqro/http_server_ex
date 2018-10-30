@@ -6,6 +6,6 @@ defmodule HttpServerEx.MIME.Test do
     assert "/file.jpeg" |> HttpServerEx.MIME.type == "image/jpeg"
     assert "/file.png"  |> HttpServerEx.MIME.type == "image/png"
     assert "/file.gif"  |> HttpServerEx.MIME.type == "image/gif"
-    assert "/foobar"  |> HttpServerEx.MIME.type == "application/octet-stream"
+    assert "/foobar"    |> HttpServerEx.MIME.type == "application/octet-stream"
   end
 end
