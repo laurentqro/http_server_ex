@@ -9,7 +9,7 @@ defmodule HttpServerEx.Parser do
 
     %Conn{
       method: method,
-      path: path,
+      path: URI.parse(path).path,
       protocol: protocol,
       headers: parse_headers(headers, %{}),
       params: parse_params(path),

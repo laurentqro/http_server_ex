@@ -55,4 +55,11 @@ defmodule HttpServerEx.Parser.Test do
 
     assert conn.params == %{ "variable_1" => "a query string parameter" }
   end
+
+  test "extracts short path from query-stringed path" do
+    request = "GET /parameters?variable_1=a%20query%20string%20parameter HTTP/1.1"
+    conn = request |> HttpServerEx.Parser.parse
+
+    assert conn.path == "/parameters"
+  end
 end
