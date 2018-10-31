@@ -8,13 +8,13 @@ defmodule HttpServerEx.Controllers.Files do
   end
 
   defp handle_file({:ok, content}, conn = %{ headers: %{"Range" => "bytes=" <> range } }) do
-    partial_content = content |> from_range(range)
+    { partial_content, range_start, range_end } = content |> from_range(range)
 
     %{ conn |
       status: 206,
       resp_body: partial_content,
       resp_headers: %{
-        "Content-Range" => "bytes #{range}/#{byte_size(content)}",
+        "Content-Range" => "bytes #{range_start}-#{range_end}/#{byte_size(content)}",
         "Content-Length" => byte_size(partial_content)
       }
     }
@@ -118,8 +118,22 @@ defmodule HttpServerEx.Controllers.Files do
     conn.headers["If-Match"] == HttpServerEx.Crypto.sha(content)
   end
 
+  defp from_range(content, "-" <> chunk_size = range) do
+    partial_content = content |> binary_part(byte_size(content), String.to_integer(range))
+    range_end = byte_size(content)
+    range_start = range_end - String.to_integer(chunk_size)
+
+    { partial_content, range_start, range_end }
+  end
+
   defp from_range(content, range) do
     [range_start, chunk_size] = range |> String.split("-")
-    content |> binary_part(String.to_integer(range_start), String.to_integer(chunk_size) + 1)
+
+    chunk_size = chunk_size |> String.to_integer
+    range_start = range_start |> String.to_integer
+    range_end = range_start + chunk_size
+
+    partial_content = content |> binary_part(range_start, chunk_size + 1)
+    { partial_content, range_start, range_end }
   end
 end

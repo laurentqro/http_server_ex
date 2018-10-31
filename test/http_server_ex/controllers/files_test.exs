@@ -202,4 +202,21 @@ defmodule HttpServerEx.Controllers.Files.Test do
     assert conn.resp_headers["Content-Length"] == 5
     assert conn.resp_body == "This "
   end
+
+  test "range request with no start value" do
+    File.write(@file_path, "This is a file that contains text to read part of in order to fulfill a 206.\n")
+
+    conn = %Conn{
+      method: "GET",
+      path: "/file.txt",
+      headers: %{"Range" => "bytes=-6"}
+    }
+
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 206
+    assert conn.resp_headers["Content-Range"] == "bytes 71-77/77"
+    assert conn.resp_headers["Content-Length"] == 6
+    assert conn.resp_body == " 206.\n"
+  end
 end
