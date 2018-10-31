@@ -121,15 +121,15 @@ defmodule HttpServerEx.Controllers.Files do
   defp from_range(content, ["", chunk_size]) do
     chunk_size = String.to_integer(chunk_size)
     partial_content = content |> binary_part(byte_size(content), -chunk_size)
-    range_end = byte_size(content)
-    range_start = range_end - chunk_size
+    range_end = byte_size(content) - 1
+    range_start = byte_size(content) - chunk_size
 
     { partial_content, range_start, range_end }
   end
 
   defp from_range(content, [range_start, ""]) do
     range_start = range_start |> String.to_integer
-    range_end = byte_size(content)
+    range_end = byte_size(content) - 1
     chunk_size  = range_end - range_start
     partial_content = content |> binary_part(byte_size(content), -chunk_size)
 

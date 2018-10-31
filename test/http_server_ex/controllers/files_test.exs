@@ -186,7 +186,43 @@ defmodule HttpServerEx.Controllers.Files.Test do
     assert !(File.read!(@file_path) |> String.contains?("patched content"))
   end
 
-  test "range request" do
+  test "range request for full document" do
+    text = "This is a file that contains text to read part of in order to fulfill a 206.\n"
+    File.write(@file_path, text)
+
+    conn = %Conn{
+      method: "GET",
+      path: "/file.txt",
+      headers: %{"Range" => "bytes=0-76"}
+    }
+
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 206
+    assert conn.resp_headers["Content-Range"] == "bytes 0-76/77"
+    assert conn.resp_headers["Content-Length"] == 77
+    assert conn.resp_body == text
+  end
+
+  test "range request for inside document" do
+    text = "This is a file that contains text to read part of in order to fulfill a 206.\n"
+    File.write(@file_path, text)
+
+    conn = %Conn{
+      method: "GET",
+      path: "/file.txt",
+      headers: %{"Range" => "bytes=10-76"}
+    }
+
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 206
+    assert conn.resp_headers["Content-Range"] == "bytes 10-76/77"
+    assert conn.resp_headers["Content-Length"] == 67
+    assert conn.resp_body == "file that contains text to read part of in order to fulfill a 206.\n"
+  end
+
+  test "range request from beginning of file" do
     File.write(@file_path, "This is a file that contains text to read part of in order to fulfill a 206.\n")
 
     conn = %Conn{
@@ -215,7 +251,7 @@ defmodule HttpServerEx.Controllers.Files.Test do
     conn = conn |> HttpServerEx.Controllers.Files.process
 
     assert conn.status == 206
-    assert conn.resp_headers["Content-Range"] == "bytes 71-77/77"
+    assert conn.resp_headers["Content-Range"] == "bytes 71-76/77"
     assert conn.resp_headers["Content-Length"] == 6
     assert conn.resp_body == " 206.\n"
   end
@@ -232,8 +268,8 @@ defmodule HttpServerEx.Controllers.Files.Test do
     conn = conn |> HttpServerEx.Controllers.Files.process
 
     assert conn.status == 206
-    assert conn.resp_headers["Content-Range"] == "bytes 4-77/77"
-    assert conn.resp_headers["Content-Length"] == 73
-    assert conn.resp_body == " is a file that contains text to read part of in order to fulfill a 206.\n"
+    assert conn.resp_headers["Content-Range"] == "bytes 4-76/77"
+    assert conn.resp_headers["Content-Length"] == 72
+    assert conn.resp_body == "is a file that contains text to read part of in order to fulfill a 206.\n"
   end
 end
