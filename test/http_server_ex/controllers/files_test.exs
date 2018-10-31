@@ -269,7 +269,7 @@ defmodule HttpServerEx.Controllers.Files.Test do
 
     assert conn.status == 206
     assert conn.resp_headers["Content-Range"] == "bytes 4-76/77"
-    assert conn.resp_headers["Content-Length"] == 72
-    assert conn.resp_body == "is a file that contains text to read part of in order to fulfill a 206.\n"
+    assert conn.resp_headers["Content-Length"] == 73
+    assert conn.resp_body == " is a file that contains text to read part of in order to fulfill a 206.\n"
   end
 end
