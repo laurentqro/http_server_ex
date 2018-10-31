@@ -185,4 +185,21 @@ defmodule HttpServerEx.Controllers.Files.Test do
     assert conn.status == 412
     assert !(File.read!(@file_path) |> String.contains?("patched content"))
   end
+
+  test "range request" do
+    File.write(@file_path, "This is a file that contains text to read part of in order to fulfill a 206.\n")
+
+    conn = %Conn{
+      method: "GET",
+      path: "/file.txt",
+      headers: %{"Range" => "bytes=0-4"}
+    }
+
+    conn = conn |> HttpServerEx.Controllers.Files.process
+
+    assert conn.status == 206
+    assert conn.resp_headers["Content-Range"] == "bytes 0-4/77"
+    assert conn.resp_headers["Content-Length"] == 5
+    assert conn.resp_body == "This "
+  end
 end

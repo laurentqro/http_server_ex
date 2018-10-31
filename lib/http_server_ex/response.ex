@@ -25,6 +25,7 @@ defmodule HttpServerEx.Response do
   defp reason(status) do
     %{
       200 => "OK",
+      206 => "Partial Content",
       404 => "Not Found",
       405 => "Method Not Allowed",
       412 => "Precondition Failed"
