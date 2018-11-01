@@ -28,7 +28,8 @@ defmodule HttpServerEx.Response do
       206 => "Partial Content",
       404 => "Not Found",
       405 => "Method Not Allowed",
-      412 => "Precondition Failed"
+      412 => "Precondition Failed",
+      416 => "Range Not Satisfiable"
     }[status]
   end
 
