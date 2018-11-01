@@ -6,7 +6,7 @@ defmodule HttpServerEx.Utilities.MIME do
     |> mime
   end
 
-  defp mime([name, ext]) do
+  defp mime([_name, ext]) do
     %{
       "jpeg" => "image/jpeg",
       "png" => "image/png",
