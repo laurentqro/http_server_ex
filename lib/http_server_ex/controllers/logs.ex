@@ -21,10 +21,6 @@ defmodule HttpServerEx.Controllers.Logs do
     %{ conn | status: 405 }
   end
 
-  def process(conn) do
-    %{ conn | status: 200 }
-  end
-
   defp authenticate(conn) do
     conn.headers["Authorization"] == "Basic #{base64_encoded_credentials()}"
   end
