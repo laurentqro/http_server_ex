@@ -10,18 +10,29 @@ defmodule HttpServerEx.Controllers.Files do
   defp handle_file({:ok, content}, conn = %{ headers: %{"Range" => "bytes=" <> range } }) do
     content_size = byte_size(content)
     range = range |> String.split("-")
-
     { range_start, range_end } = parse_range_bounds(content_size, range)
-    partial_content = content |> slice_content(range_start, range_end)
 
-    %{ conn |
-      status: 206,
-      resp_body: partial_content,
-      resp_headers: %{
-        "Content-Range" => "bytes #{range_start}-#{range_end}/#{content_size}",
-        "Content-Length" => byte_size(partial_content)
-      }
-    }
+    case valid_range?(content_size, range_start, range_end) do
+      true ->
+        partial_content = content |> slice_content(range_start, range_end)
+        %{ conn |
+          status: 206,
+          resp_body: partial_content,
+          resp_headers: %{
+            "Content-Range" => "bytes #{range_start}-#{range_end}/#{content_size}",
+            "Content-Length" => byte_size(partial_content)
+          }
+        }
+      _ ->
+        %{ conn |
+          status: 416,
+          resp_body: content,
+          resp_headers: %{
+            "Content-Range" => "bytes */#{content_size}",
+            "Content-Length" => content_size
+          }
+        }
+    end
   end
 
   defp handle_file({:ok, content}, conn = %{method: "GET"}) do
@@ -143,5 +154,9 @@ defmodule HttpServerEx.Controllers.Files do
   defp slice_content(content, range_start, range_end) do
     chunk_size = range_end - range_start + 1
     content |> binary_part(range_start, chunk_size)
+  end
+
+  defp valid_range?(content_size, range_start, range_end) do
+    range_start >= 0 && range_end < content_size
   end
 end
