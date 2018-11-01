@@ -10,7 +10,7 @@ defmodule HttpServerEx.Controllers.Logs do
     |> handle_authentication(conn)
   end
 
-  def process(conn = %{ method: "OPTIONS" }) do
+  def options(conn) do
     %{ conn |
       resp_headers: %{ "Allow" => "GET, HEAD, OPTIONS" },
       status: 200

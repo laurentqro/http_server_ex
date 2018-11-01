@@ -15,10 +15,8 @@ defmodule HttpServerEx.Controllers.Logs.Test do
     end
   end
 
-  test "OPTIONS request to logs returns GET, HEAD, OPTIONS" do
-    conn = %Conn{method: "OPTIONS", path: "/logs"}
-    conn = conn |> HttpServerEx.Controllers.Logs.process
-
+  test "OPTIONS request to /logs returns GET, HEAD, OPTIONS" do
+    conn = %Conn{} |> HttpServerEx.Controllers.Logs.options
     assert conn.resp_headers["Allow"] == "GET, HEAD, OPTIONS"
     assert conn.status == 200
   end
