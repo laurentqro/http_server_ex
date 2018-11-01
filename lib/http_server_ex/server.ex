@@ -16,7 +16,7 @@ defmodule HttpServerEx.Server do
 
     IO.puts "Connection accepted\n"
 
-    serve(client_socket)
+    spawn(fn -> serve(client_socket) end)
 
     accept_loop(listening_socket)
   end
