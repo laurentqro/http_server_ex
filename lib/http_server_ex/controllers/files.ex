@@ -1,5 +1,7 @@
 defmodule HttpServerEx.Controllers.Files do
 
+  alias HttpServerEx.Utilities.Crypto
+  alias HttpServerEx.Utilities.MIME
   alias HttpServerEx.Utilities.RangeParser
 
   @public_dir Application.get_env(:http_server_ex, :public_dir)
@@ -42,8 +44,8 @@ defmodule HttpServerEx.Controllers.Files do
       status: 200,
       resp_body: content,
       resp_headers: %{
-        "Content-Type" => HttpServerEx.Utilities.MIME.type(conn.path),
-        "ETag"         => HttpServerEx.Utilities.Crypto.sha(content)
+        "Content-Type" => MIME.type(conn.path),
+        "ETag"         => Crypto.sha(content)
       }
     }
   end
@@ -132,7 +134,7 @@ defmodule HttpServerEx.Controllers.Files do
   end
 
   defp patch_authorized?(conn, content) do
-    conn.headers["If-Match"] == HttpServerEx.Utilities.Crypto.sha(content)
+    conn.headers["If-Match"] == Crypto.sha(content)
   end
 
   defp slice_content(content, range_start, range_end) do
