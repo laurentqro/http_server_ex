@@ -8,13 +8,17 @@ defmodule HttpServerEx.Controllers.Files do
   end
 
   defp handle_file({:ok, content}, conn = %{ headers: %{"Range" => "bytes=" <> range } }) do
-    { partial_content, range_start, range_end } = from_range(content, String.split(range, "-"))
+    content_size = byte_size(content)
+    range = range |> String.split("-")
+
+    { range_start, range_end } = parse_range_bounds(content_size, range)
+    partial_content = content |> slice_content(range_start, range_end)
 
     %{ conn |
       status: 206,
       resp_body: partial_content,
       resp_headers: %{
-        "Content-Range" => "bytes #{range_start}-#{range_end}/#{byte_size(content)}",
+        "Content-Range" => "bytes #{range_start}-#{range_end}/#{content_size}",
         "Content-Length" => byte_size(partial_content)
       }
     }
@@ -118,32 +122,26 @@ defmodule HttpServerEx.Controllers.Files do
     conn.headers["If-Match"] == HttpServerEx.Crypto.sha(content)
   end
 
-  defp from_range(content, ["", chunk_size]) do
-    chunk_size = String.to_integer(chunk_size)
-    range_start = byte_size(content) - chunk_size
-    range_end   = byte_size(content) - 1
+  defp parse_range_bounds(content_size, ["", chunk_size]) do
+    range_start = content_size - String.to_integer(chunk_size)
+    range_end   = content_size - 1
 
-    partial_content = content |> binary_part(byte_size(content), -chunk_size)
-
-    { partial_content, range_start, range_end }
+    { range_start, range_end }
   end
 
-  defp from_range(content, [range_start, ""]) do
+  defp parse_range_bounds(content_size, [range_start, ""]) do
     range_start = range_start |> String.to_integer
-    range_end   = byte_size(content) - 1
-    chunk_size  = byte_size(content) - range_start
+    range_end   = content_size - 1
 
-    partial_content = content |> binary_part(byte_size(content), -chunk_size)
-
-    { partial_content, range_start, range_end }
+    { range_start, range_end }
   end
 
-  defp from_range(content, [range_start, range_end]) do
-    range_start = range_start |> String.to_integer
-    range_end   = range_end   |> String.to_integer
-    chunk_size  = range_end - range_start
+  defp parse_range_bounds(_content_size, [range_start, range_end]) do
+    { String.to_integer(range_start), String.to_integer(range_end) }
+  end
 
-    partial_content = content |> binary_part(range_start, chunk_size + 1)
-    { partial_content, range_start, range_end }
+  defp slice_content(content, range_start, range_end) do
+    chunk_size = range_end - range_start + 1
+    content |> binary_part(range_start, chunk_size)
   end
 end
