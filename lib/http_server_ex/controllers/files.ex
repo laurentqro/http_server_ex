@@ -1,5 +1,7 @@
 defmodule HttpServerEx.Controllers.Files do
 
+  alias HttpServerEx.Utilities.RangeParser
+
   @public_dir Application.get_env(:http_server_ex, :public_dir)
 
   def process(conn) do
@@ -10,7 +12,7 @@ defmodule HttpServerEx.Controllers.Files do
   defp handle_file({:ok, content}, conn = %{ headers: %{"Range" => "bytes=" <> range } }) do
     content_size = byte_size(content)
     range = range |> String.split("-")
-    { range_start, range_end } = parse_range_bounds(content_size, range)
+    { range_start, range_end } = RangeParser.parse_range_bounds(content_size, range)
 
     case valid_range?(content_size, range_start, range_end) do
       true ->
@@ -131,24 +133,6 @@ defmodule HttpServerEx.Controllers.Files do
 
   defp patch_authorized?(conn, content) do
     conn.headers["If-Match"] == HttpServerEx.Crypto.sha(content)
-  end
-
-  defp parse_range_bounds(content_size, ["", chunk_size]) do
-    range_start = content_size - String.to_integer(chunk_size)
-    range_end   = content_size - 1
-
-    { range_start, range_end }
-  end
-
-  defp parse_range_bounds(content_size, [range_start, ""]) do
-    range_start = range_start |> String.to_integer
-    range_end   = content_size - 1
-
-    { range_start, range_end }
-  end
-
-  defp parse_range_bounds(_content_size, [range_start, range_end]) do
-    { String.to_integer(range_start), String.to_integer(range_end) }
   end
 
   defp slice_content(content, range_start, range_end) do
