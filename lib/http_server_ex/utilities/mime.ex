@@ -1,4 +1,4 @@
-defmodule HttpServerEx.MIME do
+defmodule HttpServerEx.Utilities.MIME do
 
   def type(path) do
     path
