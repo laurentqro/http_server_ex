@@ -5,11 +5,10 @@ defmodule HttpServerEx.Controllers.Redirect.Test do
 
   test "HTTP request redirection" do
     conn = %Conn{
-      method: "GET",
       path: "/redirect"
     }
 
-    conn = conn |> HttpServerEx.Controllers.Redirect.process
+    conn = conn |> HttpServerEx.Controllers.Redirect.get
 
     assert conn.status == 302
     assert conn.resp_headers["Location"] == "/"

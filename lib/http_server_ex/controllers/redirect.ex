@@ -1,6 +1,6 @@
 defmodule HttpServerEx.Controllers.Redirect do
 
-  def process(conn) do
+  def get(conn) do
     %{ conn |
       status: 302,
       resp_headers: %{ "Location" => "/"}
