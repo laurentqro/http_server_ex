@@ -4,17 +4,17 @@ defmodule HttpServerEx.Controllers.Logs do
 
   alias HttpServerEx.Logger
 
+  def get(conn) do
+    conn
+    |> authenticate
+    |> handle_authentication(conn)
+  end
+
   def process(conn = %{ method: "OPTIONS" }) do
     %{ conn |
       resp_headers: %{ "Allow" => "GET, HEAD, OPTIONS" },
       status: 200
     }
-  end
-
-  def process(conn = %{ method: "GET" }) do
-    conn
-    |> authenticate
-    |> handle_authentication(conn)
   end
 
   def process(conn = %{ method: "POST" }) do

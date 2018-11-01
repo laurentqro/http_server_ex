@@ -24,25 +24,20 @@ defmodule HttpServerEx.Controllers.Logs.Test do
   end
 
   test "/logs is protected with basic authentication" do
-    conn = %Conn{method: "GET", path: "/logs"}
-    conn = conn |> HttpServerEx.Controllers.Logs.process
-
+    conn = %Conn{} |> HttpServerEx.Controllers.Logs.get
     assert conn.status == 401
   end
 
   test "/logs with basic authentication" do
-    conn = %Conn{method: "GET", path: "/logs", headers: %{"Authorization" => "Basic YWRtaW46aHVudGVyMg=="}}
-
-    conn = conn |> HttpServerEx.Controllers.Logs.process
+    conn = %Conn{headers: %{"Authorization" => "Basic YWRtaW46aHVudGVyMg=="}}
+    conn = conn |> HttpServerEx.Controllers.Logs.get
 
     assert conn.status == 200
     assert conn.resp_body == "foo"
   end
 
   test "response header to request to /logs should include authentication method" do
-    conn = %Conn{method: "GET", path: "/logs"}
-    conn = conn |> HttpServerEx.Controllers.Logs.process
-
+    conn = %Conn{} |> HttpServerEx.Controllers.Logs.get
     assert conn.resp_headers["WWW-Authenticate"] == "Basic realm=\"Access to HTTP server\""
   end
 

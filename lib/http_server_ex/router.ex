@@ -5,8 +5,8 @@ defmodule HttpServerEx.Router do
         HttpServerEx.Controllers.Redirect.get(conn)
       %{method: "GET", path: "/parameters"} ->
         HttpServerEx.Controllers.Parameters.process(conn)
-      %{path: "/logs"} ->
-        HttpServerEx.Controllers.Logs.process(conn)
+      %{method: "GET", path: "/logs"} ->
+        HttpServerEx.Controllers.Logs.get(conn)
       _ ->
         HttpServerEx.Controllers.Files.process(conn)
     end
