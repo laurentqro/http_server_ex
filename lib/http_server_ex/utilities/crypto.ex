@@ -1,4 +1,4 @@
-defmodule HttpServerEx.Crypto do
+defmodule HttpServerEx.Utilities.Crypto do
 
   def sha(content) do
     :crypto.hash(:sha, content)
