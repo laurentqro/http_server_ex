@@ -39,10 +39,8 @@ defmodule HttpServerEx.Controllers.Logs.Test do
     assert conn.resp_headers["WWW-Authenticate"] == "Basic realm=\"Access to HTTP server\""
   end
 
-  test "POST /logs returns 405" do
-    conn = %Conn{method: "POST", path: "/logs"}
-    conn = conn |> HttpServerEx.Controllers.Logs.process
-
+  test "#not_allowed returns status 405" do
+    conn = %Conn{} |> HttpServerEx.Controllers.Logs.not_allowed
     assert conn.status == 405
   end
 end

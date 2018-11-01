@@ -9,6 +9,8 @@ defmodule HttpServerEx.Router do
         HttpServerEx.Controllers.Logs.get(conn)
       %{method: "OPTIONS", path: "/logs"} ->
         HttpServerEx.Controllers.Logs.options(conn)
+      %{method: _, path: "/logs"} ->
+        HttpServerEx.Controllers.Logs.not_allowed(conn)
       _ ->
         HttpServerEx.Controllers.Files.process(conn)
     end

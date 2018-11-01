@@ -17,7 +17,7 @@ defmodule HttpServerEx.Controllers.Logs do
     }
   end
 
-  def process(conn = %{ method: "POST" }) do
+  def not_allowed(conn) do
     %{ conn | status: 405 }
   end
 
