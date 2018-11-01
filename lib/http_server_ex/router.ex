@@ -1,11 +1,11 @@
 defmodule HttpServerEx.Router do
   def route(conn) do
-    case conn.path do
-      "/redirect" ->
+    case conn do
+      %{path: "/redirect"} ->
         HttpServerEx.Controllers.Redirect.process(conn)
-      "/parameters" ->
+      %{path: "/parameters"} ->
         HttpServerEx.Controllers.Parameters.process(conn)
-      "/logs" ->
+      %{path: "/logs"} ->
         HttpServerEx.Controllers.Logs.process(conn)
       _ ->
         HttpServerEx.Controllers.Files.process(conn)
