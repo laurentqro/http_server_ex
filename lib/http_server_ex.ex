@@ -1,13 +1,13 @@
 defmodule HttpServerEx do
   use Application
 
-  def start(_type, _args) do
+  def start(_type, opts) do
     children = [
       {Task.Supervisor, name: HttpServerEx.TaskSupervisor},
-      {Task, fn -> HttpServerEx.Server.start(4000) end}
+      {Task, fn -> HttpServerEx.Server.start(opts[:port]) end}
     ]
 
-    opts = [strategy: :one_for_one, name: HttpServerEx.Supervisor]
-    Supervisor.start_link(children, opts)
+    supervisor_opts = [strategy: :one_for_one, name: HttpServerEx.Supervisor]
+    Supervisor.start_link(children, supervisor_opts)
   end
 end

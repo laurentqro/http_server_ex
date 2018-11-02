@@ -1,15 +1,17 @@
 defmodule HttpServerEx.Server.Test do
   use ExUnit.Case
 
+  @port 4000
+
   setup do
     Application.stop(:http_server_ex)
-    {:ok, _pid} = HttpServerEx.start("", [])
+    {:ok, _pid} = HttpServerEx.start("", [port: @port])
     :ok
   end
 
   setup do
     opts = [:binary, packet: :raw, active: false]
-    {:ok, socket} = :gen_tcp.connect('localhost', 4000, opts)
+    {:ok, socket} = :gen_tcp.connect('localhost', @port, opts)
     %{socket: socket}
   end
 

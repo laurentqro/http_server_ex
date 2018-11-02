@@ -7,7 +7,8 @@ defmodule HttpServerEx.MixProject do
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      escript: escript()
     ]
   end
 
@@ -21,5 +22,9 @@ defmodule HttpServerEx.MixProject do
     [
       {:cortex, "~> 0.1", only: [:dev, :test]}
     ]
+  end
+
+  defp escript do
+    [main_module: HttpServerEx.Cli]
   end
 end
