@@ -6,12 +6,19 @@ defmodule HttpServerEx.Controllers.Files do
 
   @public_dir Application.get_env(:http_server_ex, :public_dir)
 
-  def process(conn) do
-    File.read(@public_dir <> conn.path)
-    |> handle_file(conn)
+  def get(conn) do
+    case read_file(conn) do
+      {:ok, content} ->
+        conn = %{ conn | resp_headers: %{"ETag" => Crypto.sha(content)} }
+        ok(conn, content)
+      {:error, :eisdir} ->
+        ok(conn, render_dir_listing(conn))
+      {:error, :enoent} ->
+        not_found(conn)
+    end
   end
 
-  defp handle_file({:ok, content}, conn = %{ headers: %{"Range" => "bytes=" <> range } }) do
+  defp partial(range) do
     content_size = byte_size(content)
     range = range |> String.split("-")
     { range_start, range_end } = RangeParser.parse_range_bounds(content_size, range)
@@ -39,29 +46,57 @@ defmodule HttpServerEx.Controllers.Files do
     end
   end
 
-  defp handle_file({:ok, content}, conn = %{method: "GET"}) do
-    %{ conn |
-      status: 200,
-      resp_body: content,
-      resp_headers: %{
-        "Content-Type" => MIME.type(conn.path),
-        "ETag"         => Crypto.sha(content)
-      }
-    }
+  def head(conn) do
+    conn
+    |> read_file
+    |> handle_file(conn)
   end
 
-  defp handle_file({:ok, _content}, conn = %{method: "HEAD"}) do
-    %{ conn | status: 200 }
+  def put(conn) do
+    conn
+    |> read_file
+    |> handle_file(conn)
   end
 
-  defp handle_file(_, conn = %{method: "OPTIONS"}) do
+  def patch(conn) do
+    conn
+    |> read_file
+    |> handle_file(conn)
+  end
+
+  def options(conn) do
     %{ conn |
       status: 200,
       resp_headers: %{"Allow" => "GET, HEAD, OPTIONS, PUT, DELETE"}
     }
   end
 
-  defp handle_file({:error, :enoent}, conn = %{method: method}) when method in ["GET", "HEAD"] do
+  def delete(conn) do
+    File.rm(@public_dir <> conn.path)
+    %{ conn | status: 200 }
+  end
+
+  defp read_file(conn) do
+    File.read(@public_dir <> conn.path)
+  end
+
+  defp ok(conn, body) do
+    %{ conn |
+      status: 200,
+      resp_body: body,
+      resp_headers: Map.merge(base_headers(conn), conn.resp_headers)
+    }
+  end
+
+  defp not_found(conn) do
+    %{ conn | status: 404 }
+  end
+
+  defp handle_file({:ok, _content}, conn = %{method: "HEAD"}) do
+    %{ conn | status: 200 }
+  end
+
+  defp handle_file({:error, :enoent}, conn = %{method: "HEAD"}) do
     %{ conn | status: 404 }
   end
 
@@ -79,11 +114,6 @@ defmodule HttpServerEx.Controllers.Files do
     conn
     |> patch_authorized?(content)
     |> update_file(conn)
-  end
-
-  defp handle_file({:ok, _content}, conn = %{method: "DELETE"}) do
-    File.rm(@public_dir <> conn.path)
-    %{ conn | status: 200 }
   end
 
   defp handle_file({:error, :eisdir}, conn) do
@@ -144,5 +174,9 @@ defmodule HttpServerEx.Controllers.Files do
 
   defp valid_range?(content_size, range_start, range_end) do
     range_start >= 0 && range_end < content_size
+  end
+
+  defp base_headers(conn) do
+    %{ "Content-Type" => MIME.type(conn.path) }
   end
 end
