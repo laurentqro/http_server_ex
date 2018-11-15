@@ -4,22 +4,22 @@ defmodule HttpServerEx.Response.Test do
   alias HttpServerEx.Conn
 
   test "includes response status" do
-    conn = %Conn{ status: 123 }
-    response = conn |> HttpServerEx.Response.respond
+    conn = %Conn{status: 123}
+    response = conn |> HttpServerEx.Response.respond()
 
     assert response |> String.contains?("123")
   end
 
   test "includes formatted response headers" do
-    conn = %Conn{ resp_headers: %{"Foo": "Bar"} }
-    response = conn |> HttpServerEx.Response.respond
+    conn = %Conn{resp_headers: %{Foo: "Bar"}}
+    response = conn |> HttpServerEx.Response.respond()
 
     assert response |> String.contains?("Foo: Bar")
   end
 
   test "includes response body" do
-    conn = %Conn{ resp_body: "hello" }
-    response = conn |> HttpServerEx.Response.respond
+    conn = %Conn{resp_body: "hello"}
+    response = conn |> HttpServerEx.Response.respond()
 
     assert response |> String.contains?("hello")
   end
@@ -28,10 +28,10 @@ defmodule HttpServerEx.Response.Test do
     conn = %Conn{
       status: 200,
       resp_body: "hello",
-      resp_headers: %{ "Foo" => "Bar" }
+      resp_headers: %{"Foo" => "Bar"}
     }
 
-    response = conn |> HttpServerEx.Response.respond
+    response = conn |> HttpServerEx.Response.respond()
 
     expected = """
     HTTP/1.1 200 OK\r
@@ -50,7 +50,7 @@ defmodule HttpServerEx.Response.Test do
       resp_headers: %{"Foo" => "Bar", "Baz" => "Boom"}
     }
 
-    response = conn |> HttpServerEx.Response.respond
+    response = conn |> HttpServerEx.Response.respond()
 
     expected = """
     HTTP/1.1 200 OK\r

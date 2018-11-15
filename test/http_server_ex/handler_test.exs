@@ -6,14 +6,15 @@ defmodule HttpServerEx.Handler.Test do
 
   setup do
     File.mkdir_p(@test_dir)
-    on_exit fn ->
-      File.rm_rf @test_dir
-    end
+
+    on_exit(fn ->
+      File.rm_rf(@test_dir)
+    end)
   end
 
   test "returns content of file when requested" do
     File.write(@file_path, "hello")
-    response = "GET /file.txt HTTP/1.1" |> HttpServerEx.Handler.handle
+    response = "GET /file.txt HTTP/1.1" |> HttpServerEx.Handler.handle()
 
     assert response |> String.contains?("hello")
   end

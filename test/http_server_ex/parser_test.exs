@@ -3,14 +3,14 @@ defmodule HttpServerEx.Parser.Test do
 
   test "parses the verb" do
     request = "VERB /path HTTP/1.1"
-    conn = request |> HttpServerEx.Parser.parse
+    conn = request |> HttpServerEx.Parser.parse()
 
     assert conn.method == "VERB"
   end
 
   test "parses the path" do
     request = "GET /hello HTTP/1.1"
-    conn = request |> HttpServerEx.Parser.parse
+    conn = request |> HttpServerEx.Parser.parse()
 
     assert conn.path == "/hello"
   end
@@ -25,7 +25,7 @@ defmodule HttpServerEx.Parser.Test do
     \r
     """
 
-    conn = request |> HttpServerEx.Parser.parse
+    conn = request |> HttpServerEx.Parser.parse()
 
     expected = %{
       "Host" => "localhost:5000",
@@ -44,21 +44,21 @@ defmodule HttpServerEx.Parser.Test do
     Hello, world
     """
 
-    conn = request |> HttpServerEx.Parser.parse
+    conn = request |> HttpServerEx.Parser.parse()
 
     assert conn.req_body == "Hello, world\n"
   end
 
   test "parses the request query string parameters" do
     request = "GET /parameters?variable_1=a%20query%20string%20parameter HTTP/1.1"
-    conn = request |> HttpServerEx.Parser.parse
+    conn = request |> HttpServerEx.Parser.parse()
 
-    assert conn.params == %{ "variable_1" => "a query string parameter" }
+    assert conn.params == %{"variable_1" => "a query string parameter"}
   end
 
   test "extracts short path from query-stringed path" do
     request = "GET /parameters?variable_1=a%20query%20string%20parameter HTTP/1.1"
-    conn = request |> HttpServerEx.Parser.parse
+    conn = request |> HttpServerEx.Parser.parse()
 
     assert conn.path == "/parameters"
   end

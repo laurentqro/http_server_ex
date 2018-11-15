@@ -1,10 +1,6 @@
 defmodule HttpServerEx.Controllers.Parameters do
-
   def get(conn) do
-    %{ conn |
-      status: 200,
-      resp_body: render_params(conn.params)
-    }
+    %{conn | status: 200, resp_body: render_params(conn.params)}
   end
 
   defp render_params(params) do

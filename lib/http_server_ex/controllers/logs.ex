@@ -1,6 +1,6 @@
 defmodule HttpServerEx.Controllers.Logs do
-  @user_id   Application.get_env(:http_server_ex, :basic_auth_user_id)
-  @password  Application.get_env(:http_server_ex, :basic_auth_password)
+  @user_id Application.get_env(:http_server_ex, :basic_auth_user_id)
+  @password Application.get_env(:http_server_ex, :basic_auth_password)
 
   alias HttpServerEx.Logger
 
@@ -11,14 +11,11 @@ defmodule HttpServerEx.Controllers.Logs do
   end
 
   def options(conn) do
-    %{ conn |
-      resp_headers: %{ "Allow" => "GET, HEAD, OPTIONS" },
-      status: 200
-    }
+    %{conn | resp_headers: %{"Allow" => "GET, HEAD, OPTIONS"}, status: 200}
   end
 
   def not_allowed(conn) do
-    %{ conn | status: 405 }
+    %{conn | status: 405}
   end
 
   defp authenticate(conn) do
@@ -26,17 +23,11 @@ defmodule HttpServerEx.Controllers.Logs do
   end
 
   defp handle_authentication(_authorized = true, conn) do
-    %{ conn |
-      status: 200,
-      resp_body: Logger.read_logs()
-    }
+    %{conn | status: 200, resp_body: Logger.read_logs()}
   end
 
   defp handle_authentication(_authorized = false, conn) do
-    %{ conn |
-      status: 401,
-      resp_headers: conn.resp_headers |> Map.merge(www_authenticate_header())
-    }
+    %{conn | status: 401, resp_headers: conn.resp_headers |> Map.merge(www_authenticate_header())}
   end
 
   defp base64_encoded_credentials do
@@ -44,6 +35,6 @@ defmodule HttpServerEx.Controllers.Logs do
   end
 
   defp www_authenticate_header do
-    %{ "WWW-Authenticate" => "Basic realm=\"Access to HTTP server\"" }
+    %{"WWW-Authenticate" => "Basic realm=\"Access to HTTP server\""}
   end
 end

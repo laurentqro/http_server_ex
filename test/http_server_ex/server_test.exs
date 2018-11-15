@@ -5,7 +5,7 @@ defmodule HttpServerEx.Server.Test do
 
   setup do
     Application.stop(:http_server_ex)
-    {:ok, _pid} = HttpServerEx.start("", [port: @port])
+    {:ok, _pid} = HttpServerEx.start("", port: @port)
     :ok
   end
 

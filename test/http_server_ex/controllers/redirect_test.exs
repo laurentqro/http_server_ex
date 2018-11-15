@@ -8,7 +8,7 @@ defmodule HttpServerEx.Controllers.Redirect.Test do
       path: "/redirect"
     }
 
-    conn = conn |> HttpServerEx.Controllers.Redirect.get
+    conn = conn |> HttpServerEx.Controllers.Redirect.get()
 
     assert conn.status == 302
     assert conn.resp_headers["Location"] == "/"

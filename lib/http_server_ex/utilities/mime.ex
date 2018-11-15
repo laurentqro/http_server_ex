@@ -1,5 +1,4 @@
 defmodule HttpServerEx.Utilities.MIME do
-
   def type(path) do
     path
     |> String.split(".")

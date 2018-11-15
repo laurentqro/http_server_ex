@@ -7,10 +7,10 @@ defmodule HttpServerEx.Controllers.Parameters.Test do
     conn = %Conn{
       method: "GET",
       path: "/parameters?variable_1=a%20query%20string%20parameter",
-      params: %{ "variable_1" => "a query string parameter" }
+      params: %{"variable_1" => "a query string parameter"}
     }
 
-    conn = conn |> HttpServerEx.Controllers.Parameters.get
+    conn = conn |> HttpServerEx.Controllers.Parameters.get()
 
     assert conn.resp_body == "variable_1 = a query string parameter"
   end

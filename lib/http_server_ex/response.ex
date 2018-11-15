@@ -6,10 +6,11 @@ defmodule HttpServerEx.Response do
   end
 
   def build_response(conn) do
-    %{ conn |
-      status: conn.status,
-      resp_body: conn.resp_body,
-      resp_headers: format_headers(conn.resp_headers)
+    %{
+      conn
+      | status: conn.status,
+        resp_body: conn.resp_body,
+        resp_headers: format_headers(conn.resp_headers)
     }
   end
 
@@ -37,7 +38,7 @@ defmodule HttpServerEx.Response do
   defp format_headers(headers) do
     headers
     |> Enum.map(fn {k, v} -> "#{k}: #{v}" end)
-    |> Enum.reverse
+    |> Enum.reverse()
     |> Enum.join("\r\n")
   end
 end

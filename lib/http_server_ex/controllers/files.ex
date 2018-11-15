@@ -1,5 +1,4 @@
 defmodule HttpServerEx.Controllers.Files do
-
   alias HttpServerEx.Utilities.Crypto
   alias HttpServerEx.Utilities.MIME
   alias HttpServerEx.Utilities.RangeParser
@@ -11,68 +10,70 @@ defmodule HttpServerEx.Controllers.Files do
     |> handle_file(conn)
   end
 
-  defp handle_file({:ok, content}, conn = %{ headers: %{"Range" => "bytes=" <> range } }) do
+  defp handle_file({:ok, content}, conn = %{headers: %{"Range" => "bytes=" <> range}}) do
     content_size = byte_size(content)
     range = range |> String.split("-")
-    { range_start, range_end } = RangeParser.parse_range_bounds(content_size, range)
+    {range_start, range_end} = RangeParser.parse_range_bounds(content_size, range)
 
     case valid_range?(content_size, range_start, range_end) do
       true ->
         partial_content = content |> slice_content(range_start, range_end)
-        %{ conn |
-          status: 206,
-          resp_body: partial_content,
-          resp_headers: %{
-            "Content-Range" => "bytes #{range_start}-#{range_end}/#{content_size}",
-            "Content-Length" => byte_size(partial_content)
-          }
+
+        %{
+          conn
+          | status: 206,
+            resp_body: partial_content,
+            resp_headers: %{
+              "Content-Range" => "bytes #{range_start}-#{range_end}/#{content_size}",
+              "Content-Length" => byte_size(partial_content)
+            }
         }
+
       _ ->
-        %{ conn |
-          status: 416,
-          resp_body: content,
-          resp_headers: %{
-            "Content-Range" => "bytes */#{content_size}",
-            "Content-Length" => content_size
-          }
+        %{
+          conn
+          | status: 416,
+            resp_body: content,
+            resp_headers: %{
+              "Content-Range" => "bytes */#{content_size}",
+              "Content-Length" => content_size
+            }
         }
     end
   end
 
   defp handle_file({:ok, content}, conn = %{method: "GET"}) do
-    %{ conn |
-      status: 200,
-      resp_body: content,
-      resp_headers: %{
-        "Content-Type" => MIME.type(conn.path),
-        "ETag"         => Crypto.sha(content)
-      }
+    %{
+      conn
+      | status: 200,
+        resp_body: content,
+        resp_headers: %{
+          "Content-Type" => MIME.type(conn.path),
+          "ETag" => Crypto.sha(content)
+        }
     }
   end
 
   defp handle_file({:ok, _content}, conn = %{method: "HEAD"}) do
-    %{ conn | status: 200 }
+    %{conn | status: 200}
   end
 
   defp handle_file(_, conn = %{method: "OPTIONS"}) do
-    %{ conn |
-      status: 200,
-      resp_headers: %{"Allow" => "GET, HEAD, OPTIONS, PUT, DELETE"}
-    }
+    %{conn | status: 200, resp_headers: %{"Allow" => "GET, HEAD, OPTIONS, PUT, DELETE"}}
   end
 
   defp handle_file({:error, :enoent}, conn = %{method: method}) when method in ["GET", "HEAD"] do
-    %{ conn | status: 404 }
+    %{conn | status: 404}
   end
 
   defp handle_file({:ok, _content}, conn = %{method: "PUT"}) do
     write_file(conn.path, conn.req_body)
-    %{ conn | status: 200 }
+    %{conn | status: 200}
   end
 
   defp handle_file({:error, :enoent}, conn = %{method: "PUT"}) do
     write_file(conn.path, conn.req_body)
-    %{ conn | status: 201 }
+    %{conn | status: 201}
   end
 
   defp handle_file({:ok, content}, conn = %{method: "PATCH"}) do
@@ -83,18 +84,15 @@ defmodule HttpServerEx.Controllers.Files do
 
   defp handle_file({:ok, _content}, conn = %{method: "DELETE"}) do
     File.rm(@public_dir <> conn.path)
-    %{ conn | status: 200 }
+    %{conn | status: 200}
   end
 
   defp handle_file({:error, :eisdir}, conn) do
-    %{ conn |
-      status: 200,
-      resp_body: render_dir_listing(conn)
-    }
+    %{conn | status: 200, resp_body: render_dir_listing(conn)}
   end
 
   defp handle_file(_, conn = %{method: _}) do
-    %{ conn | status: 405 }
+    %{conn | status: 405}
   end
 
   defp render_dir_listing(conn) do
@@ -102,12 +100,12 @@ defmodule HttpServerEx.Controllers.Files do
     |> dir_listing
     |> Enum.map(&to_link/1)
     |> Enum.map(&to_li/1)
-    |> Enum.join
+    |> Enum.join()
   end
 
   defp dir_listing(conn) do
-    @public_dir <> conn.path
-    |> File.ls!
+    (@public_dir <> conn.path)
+    |> File.ls!()
   end
 
   defp to_link(file) do
@@ -119,18 +117,19 @@ defmodule HttpServerEx.Controllers.Files do
   end
 
   defp write_file(path, content) do
-    @public_dir <> path
+    (@public_dir <> path)
     |> File.write(content)
   end
 
   defp update_file(_authorized = true, conn) do
-    @public_dir <> conn.path
+    (@public_dir <> conn.path)
     |> File.write(conn.req_body, [:append])
-    %{ conn | status: 204 }
+
+    %{conn | status: 204}
   end
 
   defp update_file(_authorized = false, conn) do
-    %{ conn | status: 412 }
+    %{conn | status: 412}
   end
 
   defp patch_authorized?(conn, content) do
